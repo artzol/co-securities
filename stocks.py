@@ -14,7 +14,7 @@ DATE_TO = '2017-06-30'
 
 def init_quandl(key_file):
     """
-    Initialize quandl api with key from key file
+    Initialize quandl api with key from key file.
     :param key_file: path to api key file
     """
     with open(key_file, 'r') as f:
@@ -25,9 +25,9 @@ def init_quandl(key_file):
 def download_set(*symbols):
     """
     Download data for given ticker symbols from quandl.
-    Returns mapping symbol -> quandl data
+    Returns mapping { symbol: quandl data }.
     :param symbols: symbols to download
-    :return: dictionary symbol -> pandas.DataFrame
+    :return: dictionary { symbol: pandas.DataFrame }
     """
     result = {}
     for symbol in symbols:
@@ -38,9 +38,9 @@ def download_set(*symbols):
 
 def monthly_open_close(data_dict):
     """
-    Calculate average open and close price for each symbol
-    :param data_dict: dictionary of symbol -> data
-    :return:
+    Calculate average open and close price for each symbol.
+    :param data_dict: dictionary of { symbol: data }
+    :return: { symbol: { month: ..., average_open: ..., average_close: ... }
     """
     result = {}
     for symbol, data in data_dict.items():
@@ -53,6 +53,11 @@ def monthly_open_close(data_dict):
 
 
 def biggest_profit(data_dict):
+    """
+    Calculate day with highest amount of profit for each given security.
+    :param data_dict: dictionary of { symbol: data }
+    :return: { symbol: { Profit: ..., Date: ... } }
+    """
     result = {}
     for symbol, data in data_dict.items():
         result[symbol] = {}
@@ -65,6 +70,11 @@ def biggest_profit(data_dict):
 
 
 def busy_days(data_dict):
+    """
+    Find days with volume 10% higher than average for given securities.
+    :param data_dict: dictionary of { symbol: data }
+    :return: { symbol: { Average_volume: ..., Busy_days: [{ Date: ..., Volume: ... }] } }
+    """
     result = {}
     for symbol, data in data_dict.items():
         result[symbol] = {}
@@ -78,14 +88,19 @@ def busy_days(data_dict):
 
 
 def loss_days(data_dict):
+    """
+    Find security with the most days where the closing price was lower than the opening price.
+    :param data_dict: dictionary of { symbol: data }
+    :return: { symbol: ..., days: ... }
+    """
     days_per_ticker = []
     for symbol, data in data_dict.items():
         days = data.loc[data['Close'] < data['Open']]
         days_per_ticker.append((symbol, days.shape[0]))
-    min_symbol, min_days = min(days_per_ticker)
+    max_symbol, max_days = max(days_per_ticker)
     return {
-        'symbol': min_symbol,
-        'days': min_days
+        'symbol': max_symbol,
+        'days': max_days
     }
 
 
