@@ -17,9 +17,14 @@ def init_quandl(key_file):
     Initialize quandl api with key from key file.
     :param key_file: path to api key file
     """
-    with open(key_file, 'r') as f:
-        key = f.read()
-        quandl.ApiConfig.api_key = key
+    try:
+        with open(key_file, 'r') as f:
+            key = f.read()
+            quandl.ApiConfig.api_key = key
+    except IOError as err:
+        print("Couldn't open api keyfile")
+        print(err)
+        exit(1)
 
 
 def download_set(*symbols):
@@ -111,12 +116,15 @@ def main(api_keyfile, show_profit=False, show_busy=False, show_loser=False):
     processed = monthly_open_close(data)
     pprint.pprint(processed)
     if show_profit:
+        print('Max daily profit')
         p2 = biggest_profit(data)
         pprint.pprint(p2)
     if show_busy:
+        print('Busy days')
         r = busy_days(data)
         pprint.pprint(r)
     if show_loser:
+        print('Biggest loser')
         r = loss_days(data)
         pprint.pprint(r)
 
